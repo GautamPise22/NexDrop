@@ -44,11 +44,9 @@ fastify.setErrorHandler(async (error, request, reply) => {
   return reply.status(statusCode).send({ success: false, message: error.message });
 });
 
-app.get('/', (req, res) => {
-  res.status(200).json({ message: "Welcome to the Nex Drop API!" });
+fastify.get('/', async (request, reply) => {
+  return reply.status(200).send({ message: "Welcome to the Nex Drop API!" });
 });
-
-fastify.get("/health", async () => ({ status: "ok", ts: new Date().toISOString() }));
 
 fastify.register(appRoutes, { prefix: "/api" });
 
