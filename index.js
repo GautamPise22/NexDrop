@@ -1,13 +1,10 @@
+import "dotenv/config";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import appRoutes from "./routes/index.js"; 
 import { initFirebase } from "./config/firebase.config.js";
 
-// Optional: Only load dotenv locally, not on Vercel
-if (!process.env.VERCEL) {
-  import("dotenv/config");
-}
 
 const fastify = Fastify({
   logger: process.env.NODE_ENV === "development",
@@ -80,4 +77,14 @@ export default async function handler(req, res) {
   }
 
   res.end(response.body);
+}
+
+if (!process.env.VERCEL) {
+  const PORT = parseInt(process.env.PORT ?? "3000", 10);
+  fastify.listen({ port: PORT, host: "0.0.0.0" })
+    .then(() => console.log(`🚀 Local dev server listening on port ${PORT}`))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
 }

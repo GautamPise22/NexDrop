@@ -4,6 +4,7 @@ import { readFileSync } from "fs";
 
 let app;
 
+
 export function initFirebase() {
   if (admin.apps.length) return admin.apps[0]; // already initialised
 
@@ -33,19 +34,19 @@ export function initFirebase() {
   return app;
 }
 
-// Lazy-loaded helpers ─────────────────────────────────────────────────
+  // Lazy-loaded helpers ─────────────────────────────────────────────────
 
-/** Firestore instance */
-export const db = () => admin.firestore();
+  /** Firestore instance */
+  export const db = () => admin.firestore();
 
-/** Firebase Auth instance */
-export const firebaseAuth = () => admin.auth();
+  /** Firebase Auth instance */
+  export const firebaseAuth = () => admin.auth();
 
-// Firestore collection names (single source of truth)
-export const COLLECTIONS = {
-  USERS: "users",
-  OTP: "otps",
-  REFRESH_TOKENS: "refresh_tokens",
-  TEMP_USERS: "temp_users",
-  TEMP_OTPS: "temp_otps",
-};
+  // Firestore collection names (single source of truth)
+  export const COLLECTIONS = {
+    USERS: "users",
+    OTP: "otps",
+    REFRESH_TOKENS: "refresh_tokens",
+    TEMP_USERS: "temp_users",
+    TEMP_OTPS: "temp_otps",
+  };
