@@ -1,25 +1,26 @@
-import "dotenv/config";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import appRoutes from "./routes/index.js"; 
 import { initFirebase } from "./config/firebase.config.js";
 
-initFirebase();
+// Optional: Only load dotenv locally, not on Vercel
+if (!process.env.VERCEL) {
+  import("dotenv/config");
+}
 
 const fastify = Fastify({
   logger: process.env.NODE_ENV === "development",
 });
 
+// REMOVED 'await' here. Fastify will queue these up.
+fastify.register(helmet, { global: true });
 
-await fastify.register(helmet, { global: true });
-
-await fastify.register(cors, {
+fastify.register(cors, {
   origin: process.env.ALLOWED_ORIGINS?.split(",") ?? true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
 });
-
 
 fastify.setErrorHandler(async (error, request, reply) => {
   const statusCode = error.statusCode ?? error.status ?? 500;
@@ -43,24 +44,38 @@ fastify.setErrorHandler(async (error, request, reply) => {
   return reply.status(statusCode).send({ success: false, message: error.message });
 });
 
-
 fastify.get("/health", async () => ({ status: "ok", ts: new Date().toISOString() }));
 
 fastify.register(appRoutes, { prefix: "/api" });
 
-
-export default async function handler(req, res) {
-  await fastify.ready();
-  
-  fastify.server.emit('request', req, res);
+// Initialize Firebase safely
+try {
+  initFirebase();
+} catch (error) {
+  console.error("Firebase init failed:", error);
 }
 
-if (!process.env.VERCEL) {
-  const PORT = parseInt(process.env.PORT ?? "3000", 10);
-  fastify.listen({ port: PORT, host: "0.0.0.0" })
-    .then(() => console.log(`🚀 Local dev server listening on port ${PORT}`))
-    .catch((err) => {
-      console.error(err);
-      process.exit(1);
-    });
+// Cache the app state to prevent Vercel timeouts on cold starts
+let appReady = false;
+
+export default async function handler(req, res) {
+  if (!appReady) {
+    await fastify.ready();
+    appReady = true;
+  }
+
+  const response = await fastify.inject({
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    payload: req.method !== "GET" ? req.body : undefined,
+  });
+
+  res.statusCode = response.statusCode;
+  
+  for (const [key, value] of Object.entries(response.headers)) {
+    res.setHeader(key, value);
+  }
+
+  res.end(response.body);
 }
