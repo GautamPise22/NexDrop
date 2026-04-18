@@ -63,6 +63,8 @@ export default async function handler(req, res) {
     appReady = true;
   }
 
+  delete req.headers["content-length"];
+
   const response = await fastify.inject({
     method: req.method,
     url: req.url,
