@@ -1,0 +1,31 @@
+export const USER_ROLE = {
+    PRO_USER: 'PRO_USER', 
+    NORMAL_USER: 'USER'
+};
+
+export const STATUS = {
+    OK: 200,
+    INTERNAL_SERVER_ERROR: 500,
+    CREATED: 201,
+    UNAUTHORISED: 401,
+    NOT_FOUND: 404,
+    BAD_REQUEST: 400,
+    FORBIDDEN: 403,
+    UNPROCESSABLE_ENTITY: 422,
+    GONE: 410,
+    PAYMENT_REQUIRED: 402
+};
+
+export const OTP_PURPOSE = {
+    SIGNIN: "SIGNIN",
+    SIGNUP: "SIGNUP",
+    RESET_PASSWORD: "RESET_PASSWORD"
+}
+
+export const REGEX = {
+    EMAIL: /^[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+}
+
+export const UUIDCASE = {
+    CASE: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+}
